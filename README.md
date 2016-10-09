@@ -1,7 +1,7 @@
 # Find-GUI
 Simple Graphical Interface to GNU Find.
 
-Features ability to save find commands.
+Features the ability to save search options.
 
 Screen Shots
 
