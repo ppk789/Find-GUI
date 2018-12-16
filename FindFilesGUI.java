@@ -1117,7 +1117,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
 
 
     public List<String> readFile(String filename){
-        //Read the saved "find" file and set the options on the GUI
+        /**Read the saved "find" file and set the options on the GUI */
   List<String> records = new ArrayList<String>();
   try
   {
@@ -1168,10 +1168,14 @@ public class FindFilesGUI extends javax.swing.JFrame {
                 break;
             case "TypeOptn":
                 if (cmd[1] != "" ){
-                    jTextFileNamePattern.setText(s);
+                   // jTextFileNamePattern.setText(s);
                    
                 }
                 break;
+            case "FindText":
+                if (cmd[1] != ""){
+                        jTextFileNamePattern.setText(s);
+                }
             case "followlink":
                  switch (s) {
                      case "-L":
