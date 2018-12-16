@@ -1,3 +1,5 @@
+package FindFilesGUI;
+
 /*
  * 
  * GNU Find File GUI Utility
@@ -50,19 +52,27 @@ public class FindFilesGUI extends javax.swing.JFrame {
     double tStart = 0;
     double tFinish = 0;
     String command = "";
+    String FindPath = "";
      
     
     public FindFilesGUI() {
+        /** Main Class to initialize components
+         *  Locates the caret in main text area
+         *  Check the find path and update 
+         */
         initComponents();
         setLocationRelativeTo(null);
         setTitle("Find File Utility");
+        /* Caret is a vertical line that shows the cursor position in a text area */
         DefaultCaret caret = (DefaultCaret)jTextArea2.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-    
         
-        checkFindPath();
-        setPreviewCommand();
-        this.getRootPane().setDefaultButton(jBtnFind);
+        
+        checkFindPath();// validate find path
+        init_user_home();  // set the initial path to search from to users home directory / folder
+        setPreviewCommand();                    //set the command preview text field
+        this.getRootPane().setDefaultButton(jBtnFind);       
+        
     }
 
     /**
@@ -385,7 +395,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
                                             .addComponent(jTextFindPath, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                             .addComponent(jBtnBrowse, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGap(0, 124, Short.MAX_VALUE))))
+                                .addGap(0, 150, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jBtnHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -444,7 +454,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jBtnFind)
@@ -461,12 +471,30 @@ public class FindFilesGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public String getFindPath(){
+        //String FindPath = "";    
+        
+        /** Returns String path to the find command  */
+            if (jTextFind.getText().length() > 0) {
+               File file = new File(jTextFind.getText() );
+                if (file.exists()) {
+                    this.FindPath = file.getPath();
+                } else {
+                    this.FindPath = "FindPath ";
+                }
+                
+                
+            } else {
+                this.FindPath = "FindPath, ";
+            }
+            return this.FindPath;
+    }
    
 
-   private String getOptions() {
+   public String getOptions() {
        //Get the options for the command string
        //TODo put these into more object oreintated format
-    String FindPath = "";
+    //String FindPath = "";
     String followlink = "";
     String SearchPath = "";
     String FindText = "";
@@ -478,13 +506,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
     
     //Todo set these operations as individual methods so they can be called from multiple locations
     // without duplicating code
-    
-    if (jTextFind.getText().length() > 0) {
-        FindPath = "FindPath," + jTextFind.getText()+"";
-    } else {
-        FindPath = "FindPath, ";
-    }
-    
+    this.FindPath = this.getFindPath();
     
     //-------------------------------------------------------
       if (jCheckBoxFollowLink.isSelected()) {
@@ -507,6 +529,8 @@ public class FindFilesGUI extends javax.swing.JFrame {
           followlink = "followlink ";
       }
         
+      
+      
       //-------------------------------------------------------
       if (jCheckBoxPath.isSelected()) {
                 
@@ -607,24 +631,9 @@ public class FindFilesGUI extends javax.swing.JFrame {
             
     } 
     
-    public void setPreviewCommand(){
-        //Updates the preview text field with find command options
-        //TODO Probably separate into individual objection functinos
-    String FindPath = "";
-    String followlink = "";
-    String SearchPath = "";
-    String FindText = "";
-    String TypeOptn = "";
-    String ModifiedOption = "";
-    String OtherOptions = "-print";
-    String Preview = "";
-    
-           
-        
-    if (jTextFind.getText().length() > 0) {
-        FindPath = jTextFind.getText();
-    }
-    
+    public String getFollowLinkOption(){
+        /** Gets the follow link options */
+      String followlink = "";  
       if (jCheckBoxFollowLink.isSelected()) {
            jComboBoxFollowLink.setEnabled(true);
           switch(jComboBoxFollowLink.getSelectedIndex()) {
@@ -641,10 +650,53 @@ public class FindFilesGUI extends javax.swing.JFrame {
           
       }else {
                   jComboBoxFollowLink.setEnabled(false);
-              
        }
+      return (followlink);
+    }
+   
+    public void setPreviewCommand(){
+        /**Reads options on GUI and formats the command in preview text field
+         * Updates the preview text field with find command options */
+        //TODO Probably separate into individual objection methods
+    String FindPath = "";
+    String followlink = "";
+    String SearchPath = "";
+    String FindText = "";
+    String TypeOptn = "";
+    String ModifiedOption = "";
+    String OtherOptions = "-print";
+    String Preview = "";
+    String commandopt = "";
+    
+           
+    FindPath = this.getFindPath();    
+    //if (jTextFind.getText().length() > 0) {
+    //    FindPath = jTextFind.getText();
+    //}
+    
+    followlink = this.getFollowLinkOption();
+    
+    //      if (jCheckBoxFollowLink.isSelected()) {
+    //           jComboBoxFollowLink.setEnabled(true);
+    //          switch(jComboBoxFollowLink.getSelectedIndex()) {
+    //              case 0:
+    //                  followlink = " -L";
+    //                  break;
+    //              case 1:
+    //                  followlink = " -P";
+    //                  break;
+    //              case 2: 
+    //                  followlink = " -H";
+    //                  break;
+    //          }
+    //          
+    //      }else {
+    //                  jComboBoxFollowLink.setEnabled(false);
+    //              
+    //       }
       //-------------------------------------------------------
       if (jCheckBoxPath.isSelected()) {
+          /** The location from which to start search */
           jTextFindPath.setEnabled(true);
           
           if (jCheckBoxPath.isEnabled()) {
@@ -737,14 +789,20 @@ public class FindFilesGUI extends javax.swing.JFrame {
       }
       
       
-    command = FindPath + followlink + SearchPath + TypeOptn + ModifiedOption + FindText + OtherOptions;
-    Preview = "Preview:> " + command;
+    commandopt = followlink + SearchPath + TypeOptn + ModifiedOption + FindText + OtherOptions;
+    Preview = "Preview:> " + FindPath + commandopt;
+    this.command = FindPath = commandopt;
     jTextArea1.setText(Preview);
 }
     
     
-    private void checkFindPath() {
-        //Checks that the "find" command is available on the OS
+    public void checkFindPath() {
+        /** Checks that the "find" command is available on the OS 
+         * Check for a file called "FindPath.txt" 
+         * get the previously located find path and populate the GUI field
+         * If a path has not been entered try the default "/usr/bin/find"
+         * Otherwise leave blank
+         */
         File file = new File("FindPath.txt");
         if (file.exists()) {
                 try (Scanner input = new Scanner(file)) {
@@ -763,7 +821,9 @@ public class FindFilesGUI extends javax.swing.JFrame {
         }
     }
     
-    private void setFindPath(String path) {
+    public void setFindPath(String path) {
+        /** Writes the path to the find command to a text file */
+        
         File file = new File("FindPath.txt");
         try {
             PrintWriter output = new PrintWriter(file);
@@ -775,6 +835,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
     }
     
     private void jBtnFindPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnFindPathActionPerformed
+        /** Open file dialog to choose the path to the find command */
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select filepath for find");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("find file (.exe)", "exe");
@@ -782,8 +843,10 @@ public class FindFilesGUI extends javax.swing.JFrame {
         if (fileChooser.showDialog(this, "Select") == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             jTextFind.setText(file.getPath());
-            setFindPath(file.getPath());
+            setFindPath(file.getPath());   //remember where "find" is... write the path to a text file.
         }
+        
+        
         
         
     }//GEN-LAST:event_jBtnFindPathActionPerformed
@@ -808,8 +871,6 @@ public class FindFilesGUI extends javax.swing.JFrame {
         
         
     }//GEN-LAST:event_jBtnFindActionPerformed
-
-   
 
     private void jBtnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCancelActionPerformed
         //Run the find process.
@@ -1055,7 +1116,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
 
 
 
-    private List<String> readFile(String filename){
+    public List<String> readFile(String filename){
         //Read the saved "find" file and set the options on the GUI
   List<String> records = new ArrayList<String>();
   try
@@ -1077,7 +1138,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
   }
 }
 
-    private void setGUIFields(List<String> findoptions) {
+    public void setGUIFields(List<String> findoptions) {
         //Need to check all this.
         //Sets all the find option fields on the form
         String[] cmd = {};
@@ -1167,6 +1228,13 @@ public class FindFilesGUI extends javax.swing.JFrame {
         }
         } 
     }
+
+    private void init_user_home() {
+      //  throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      jTextFindPath.setText(System.getProperty("user.home"));
+    
+    }
+    
     
     class HelpThread implements Runnable {
      // Show the man page, but not very readable.
@@ -1208,6 +1276,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
     public void ShowHelpPage(String cmd){
         String Kommand = cmd;  //Vas is das?
         String[] cmdResult;
+        
        try{
             cmdResult = getCommand(Kommand, " "); //tokenise  
             processHelp = new ProcessBuilder(cmdResult).start();
@@ -1226,11 +1295,18 @@ public class FindFilesGUI extends javax.swing.JFrame {
     
     class FindThread implements Runnable {
        //And find the files in a separate thread
+        //3 Dec 18.  Add double quotes to find path to command
         @Override
         public void run() {
-            String FindPath = jTextFind.getText();
+            String FindPath;
+            File file = new File(jTextFind.getText());
+            if (file.exists()) {
+                FindPath = file.getPath(); 
+            } else {
+                FindPath = "\"" + jTextFind.getText() + "\"";
+            }
             String inFile = jTextFileNamePattern.getText();
-        //    String outFile = jTextSaveFile.getText();
+            //    String outFile = jTextSaveFile.getText();
            FindFiles(FindPath, inFile ); 
         }
     }
@@ -1240,20 +1316,33 @@ public class FindFilesGUI extends javax.swing.JFrame {
         
         String outfile = "";
         String[] cmdresult;
+       
         try {
                jTextArea2.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             try {
 
 
-                String fCommand = command;
-                jTextArea2.append(">Command: "+fCommand+"\r\n\r\n");
+                String fCommand = FindPath + this.command;
+                //jTextArea2.append(">Command: "+fCommand+"\r\n\r\n");
 
                 tStart = System.currentTimeMillis();
-
-                cmdresult = getCommand(command , " ");
-
-
-                processFind = new ProcessBuilder(cmdresult).start();
+                
+                cmdresult = getCommand( this.command, " ");
+                String[] cmd = new String[cmdresult.length + 1];
+                cmd[0] = this.FindPath;
+                int i = 1;
+                for ( String s: cmdresult) {
+                    cmd[i++] =  s;
+                }
+                jTextArea2.append(">Command: ");
+                for (String s: cmd){
+                    
+                    jTextArea2.append(" " + s);
+                    
+                }
+                jTextArea2.append("\r\n\r\n");
+                
+                               processFind = new ProcessBuilder(cmd).start();
                 // Debug // jTextArea2.append(Arrays.toString(cmdresult));
 
 
@@ -1271,12 +1360,13 @@ public class FindFilesGUI extends javax.swing.JFrame {
     }
     
     
-    private static String[] getCommand(String input, String delim) {
-    //Tokenize the find command arguments
+    private static String[] getCommand( String input, String delim) {
+    /**Tokenize the find command arguments */
     StringTokenizer tokenizer = new StringTokenizer(input,delim);
     String[] result = new String[tokenizer.countTokens()];
     
     for (int i = 0; tokenizer.hasMoreTokens(); i++) {
+        
         result[i] = tokenizer.nextToken();
     }
     return result;
@@ -1313,7 +1403,7 @@ public class FindFilesGUI extends javax.swing.JFrame {
         jTextArea2.append("Exited with error code "+process1.waitFor()+"\r\n");
         tFinish = System.currentTimeMillis();
         jTextArea2.append("Run time: " + ((tFinish-tStart)/1000)+"secs\r\n");
-        
+        jTextArea2.append("\r\n\r\n");  //Add some new lines to scroll the text area
         jBtnHelp.setEnabled(true);
         jBtnFind.setEnabled(true);
     }
